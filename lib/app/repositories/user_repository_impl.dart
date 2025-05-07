@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 import 'package:todo_list_provider/app/core/exceptions/exceptions.dart';
 import 'package:todo_list_provider/app/repositories/user_repository.dart';
 
@@ -25,6 +26,32 @@ class UserRepositoryImpl implements UserRepository {
         throw AuthException(message: 'Email inválido');
       } else {
         throw AuthException(message: 'Erro ao cadastrar usuário');
+      }
+    } catch (e, s) {
+      log(e.toString(), error: s);
+      throw AuthException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<User?> login(String email, String password) async {
+    try {
+      final userCredential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      return userCredential.user;
+    } on PlatformException catch (e, s) {
+      log(e.toString(), error: s);
+      throw AuthException(message: 'Erro ao fazer login');
+    } on FirebaseAuthException catch (e, s) {
+      log(e.toString(), error: s);
+      if (e.code == 'wrong-password' ||
+          e.code == 'invalid-email' ||
+          e.code == 'invalid-credential' ||
+          e.code == 'user-not-found') {
+        throw AuthException(message: 'Login ou senha inválidos');
+      } else if (e.code == 'operation-not-allowed') {
+        throw AuthException(message: 'Operação não permitida');
+      } else {
+        throw AuthException(message: 'Erro ao fazer login');
       }
     } catch (e, s) {
       log(e.toString(), error: s);
