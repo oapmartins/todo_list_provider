@@ -39,7 +39,6 @@ class _RegisterPageState extends State<RegisterPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
-    context.read<RegisterController>().removeListener(() {});
     super.dispose();
   }
 
