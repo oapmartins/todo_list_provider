@@ -1,10 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo_list_provider/app/core/ui/theme_extensions.dart';
 import 'package:todo_list_provider/app/core/widgets/todo_list_field.dart';
 import 'package:todo_list_provider/app/core/widgets/todo_list_logo.dart';
+import 'package:todo_list_provider/app/modules/auth/register/register_controller.dart';
+import 'package:validatorless/validatorless.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final controller = context.read<RegisterController>();
+    controller.addListener(() {
+      if (controller.success) {
+        Navigator.pop(context);
+      } else if (controller.error != null && controller.error!.isNotEmpty) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(controller.error!), backgroundColor: Colors.red));
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    context.read<RegisterController>().removeListener(() {});
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,18 +78,49 @@ class RegisterPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
             child: Form(
+              key: _formKey,
               child: Column(
                 children: [
-                  TodoListField(label: 'Email'),
+                  TodoListField(
+                    label: 'Email',
+                    controller: _emailController,
+                    validator: Validatorless.multiple([
+                      Validatorless.email('Email inválido'),
+                      Validatorless.required('Email obrigatório'),
+                    ]),
+                  ),
                   SizedBox(height: 20),
-                  TodoListField(label: 'Senha', obscureText: true),
+                  TodoListField(
+                    label: 'Senha',
+                    controller: _passwordController,
+                    obscureText: true,
+                    validator: Validatorless.multiple([
+                      Validatorless.required('Senha obrigatória'),
+                      Validatorless.min(6, 'Senha deve ter pelo menos 6 caracteres'),
+                    ]),
+                  ),
                   SizedBox(height: 20),
-                  TodoListField(label: 'Confirmar Senha', obscureText: true),
+                  TodoListField(
+                    label: 'Confirmar Senha',
+                    controller: _confirmPasswordController,
+                    obscureText: true,
+                    validator: Validatorless.multiple([
+                      Validatorless.required('Confirma senha obrigatória'),
+                      Validatorless.compare(_passwordController, 'As senhas não conferem'),
+                    ]),
+                  ),
                   SizedBox(height: 20),
                   Align(
                     alignment: Alignment.bottomRight,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        if (_formKey.currentState?.validate() ?? false) {
+                          context.read<RegisterController>().registerUser(
+                            _emailController.text,
+                            _passwordController.text,
+                          );
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       ),
