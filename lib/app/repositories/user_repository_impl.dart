@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:todo_list_provider/app/core/exceptions/exceptions.dart';
 import 'package:todo_list_provider/app/repositories/user_repository.dart';
 
@@ -57,5 +58,54 @@ class UserRepositoryImpl implements UserRepository {
       log(e.toString(), error: s);
       throw AuthException(message: e.toString());
     }
+  }
+
+  @override
+  Future<void> forgotPassword(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+    } catch (e, s) {
+      log(e.toString(), error: s);
+      throw AuthException(message: e.toString());
+    }
+  }
+
+  @override
+  Future<User?> googleLogin() async {
+    try {
+      final googleSigning = GoogleSignIn();
+      final googleAccount = await googleSigning.signIn();
+      if (googleAccount != null) {
+        final googleAuth = await googleAccount.authentication;
+        final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken,
+        );
+
+        final userCredential = await _firebaseAuth.signInWithCredential(credential);
+        return userCredential.user;
+      } else {
+        throw AuthException(message: 'Erro ao fazer login com o Google');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'account-exists-with-different-credential') {
+        throw AuthException(message: 'Conta já existe com outro provedor');
+      } else if (e.code == 'invalid-credential') {
+        throw AuthException(message: 'Credencial inválida');
+      } else if (e.code == 'operation-not-allowed') {
+        throw AuthException(message: 'Operação não permitida');
+      } else {
+        throw AuthException(message: 'Erro ao fazer login com o Google');
+      }
+    } on AuthException catch (e, s) {
+      log(e.toString(), error: s);
+      throw AuthException(message: e.message);
+    }
+  }
+
+  @override
+  Future<void> googleLogout() async {
+    await GoogleSignIn().signOut();
+    return _firebaseAuth.signOut();
   }
 }
