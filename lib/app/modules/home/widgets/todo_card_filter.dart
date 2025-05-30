@@ -11,22 +11,22 @@ import '../home_controller.dart';
 class TodoCardFilter extends StatelessWidget {
   final String label;
   final TaskFilterEnum taskFilter;
-  final TotalTasksModel? totalTasksModel;
+  final TotalTasksModel totalTasksModel;
   final bool selected;
 
   const TodoCardFilter({
     super.key,
     required this.label,
     required this.taskFilter,
-    this.totalTasksModel,
+    required this.totalTasksModel,
     required this.selected,
   });
 
   // int? get totalRemainTasks => totalTasksModel!.totalTasks - totalTasksModel!.totalTasksFinish;
 
   double _getPercentFinish() {
-    final total = totalTasksModel?.totalTasks ?? 0;
-    final totalFinish = totalTasksModel?.totalTasksFinish ?? 0.1;
+    final total = totalTasksModel.totalTasks;
+    final totalFinish = totalTasksModel.totalTasksFinish;
 
     if (total == 0) return 0.0;
 
@@ -50,9 +50,10 @@ class TodoCardFilter extends StatelessWidget {
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '${0} TASKS',
+              '${totalTasksModel.totalTasks} TASKS',
               style: context.titleStyle.copyWith(fontSize: 10, color: selected ? Colors.white : Colors.grey),
             ),
             Text(
