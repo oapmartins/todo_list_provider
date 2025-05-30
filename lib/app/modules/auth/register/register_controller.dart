@@ -1,6 +1,6 @@
 import 'package:todo_list_provider/app/core/exceptions/exceptions.dart';
 import 'package:todo_list_provider/app/core/notifier/default_change_notifier.dart';
-import 'package:todo_list_provider/app/services/user_service.dart';
+import 'package:todo_list_provider/app/services/user/user_service.dart';
 
 class RegisterController extends DefaultChangeNotifier {
   RegisterController(this._userService);

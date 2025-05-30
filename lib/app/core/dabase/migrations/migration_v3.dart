@@ -1,11 +1,11 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:todo_list_provider/app/core/dabase/migrations/migration.dart';
 
-class MigrationV1 implements Migration {
+class MigrationV3 implements Migration {
   @override
   void create(Batch batch) {
     batch.execute('''
-      CREATE TABLE todo (
+      CREATE TABLE todo3 (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         description varchar(500) NOT NULL,
         created_at datetime,

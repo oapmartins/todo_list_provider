@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sign_button/sign_button.dart';
@@ -26,7 +28,7 @@ class _LoginPageState extends State<LoginPage> {
     DefaultListenerNotifier(context.read<LoginController>()).listener(
       context: context,
       onSuccess: (notifier, listenerNotifier) {
-        print('Login successful');
+        log('Login successful');
       },
       onEverCallback: (notifier, listenerNotifier) {
         if (notifier is LoginController && notifier.hasInfo) {

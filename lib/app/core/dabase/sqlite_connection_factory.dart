@@ -7,9 +7,10 @@ import 'package:todo_list_provider/app/core/dabase/sqlite_migration_factory.dart
 
 class SqliteConnectionFactory {
   static const _VERSION = 1;
-  static const _DATABASE_NAME = 'todo_list_provider.db';
+  static const _DATABASE_NAME = 'TODO_LIST_PROVIDER';
 
   static SqliteConnectionFactory? _instance;
+
   Database? _db;
   final _lock = Lock();
 
@@ -21,11 +22,10 @@ class SqliteConnectionFactory {
   }
 
   Future<Database> openConnection() async {
-    final databasePath = await getDatabasesPath();
-    final databasePathFinal = join(databasePath, _DATABASE_NAME);
-
+    var databasePath = await getDatabasesPath();
+    var databasePathFinal = join(databasePath, _DATABASE_NAME);
     if (_db == null) {
-      _lock.synchronized(() async {
+      await _lock.synchronized(() async {
         _db ??= await openDatabase(
           databasePathFinal,
           version: _VERSION,
@@ -49,26 +49,24 @@ class SqliteConnectionFactory {
   }
 
   Future<void> _onCreate(Database db, int version) async {
-    final Batch batch = db.batch();
+    final batch = db.batch();
 
     final migrations = SqliteMigrationFactory().getCreateMigration();
     for (var migration in migrations) {
       migration.create(batch);
     }
-
     batch.commit();
   }
 
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    final Batch batch = db.batch();
+  Future<void> _onUpgrade(Database db, int oldVersion, int version) async {
+    final batch = db.batch();
 
     final migrations = SqliteMigrationFactory().getUpgradeMigration(oldVersion);
     for (var migration in migrations) {
       migration.upgrade(batch);
     }
-
     batch.commit();
   }
 
-  Future<void> _onDowngrade(Database db, int oldVersion, int newVersion) async {}
+  Future<void> _onDowngrade(Database db, int oldVersion, int version) async {}
 }

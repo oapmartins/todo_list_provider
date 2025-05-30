@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:todo_list_provider/app/app_widget.dart';
 import 'package:todo_list_provider/app/core/auth/auth_provider_app.dart';
 import 'package:todo_list_provider/app/core/dabase/sqlite_connection_factory.dart';
-import 'package:todo_list_provider/app/repositories/user_repository.dart';
-import 'package:todo_list_provider/app/repositories/user_repository_impl.dart';
-import 'package:todo_list_provider/app/services/user_service.dart';
-import 'package:todo_list_provider/app/services/user_service_impl.dart';
+import 'package:todo_list_provider/app/repositories/user/user_repository.dart';
+import 'package:todo_list_provider/app/repositories/user/user_repository_impl.dart';
+import 'package:todo_list_provider/app/services/user/user_service.dart';
+import 'package:todo_list_provider/app/services/user/user_service_impl.dart';
 
 class AppModule extends StatelessWidget {
   const AppModule({super.key});
